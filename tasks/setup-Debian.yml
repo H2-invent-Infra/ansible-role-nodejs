@@ -6,19 +6,18 @@
       - gnupg2
     state: present
 
-- name: Add Nodesource apt key.
-  apt_key:
-    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
-    id: "68576280"
-    state: present
+- name: Download apt key
+  get_url:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    dest: /etc/apt/trusted.gpg.d/nodesource.gpg.key
 
 - name: Add NodeSource repositories for Node.js.
   apt_repository:
     repo: "{{ item }}"
     state: present
   with_items:
-    - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
-    - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    - "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/nodesource.gpg.key] https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    - "deb-src [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/nodesource.gpg.key] https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
   register: node_repo
 
 - name: Update apt cache if repo was added.
